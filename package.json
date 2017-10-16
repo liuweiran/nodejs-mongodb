@@ -1,0 +1,16 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+
+  },
+  "author": {
+    "name": "LWR",
+    "email": "ran0046@fomxail.com"
+  },
+  "private": true,
+  "devDependencies": {
+    "express": "^4.14.0"
+  }
+}
