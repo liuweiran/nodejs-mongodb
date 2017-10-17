@@ -8,21 +8,28 @@
     <title>index</title>
 </head>
 <body>
-
+<div id="box"></div>
 </body>
 <script>
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function(){
-        //console.log(xhr.readyState);
-        if(xhr.readyState==4){
-            if(xhr.status>=200 && xhr.status<300 || xhr.status==304){
-                //成功接收
-                //console.log(xhr.responseText)
-                box.innerHTML = xhr.responseText;
-            }else{
-                alert('抱歉，文件没有找到！')
+    window.onload = function() {
+        var box = document.getElementById('box');
+        var xhr = new XMLHttpRequest();
+        xhr.open('get', 'http://localhost:3000/123', true);
+        xhr.send();
+
+        xhr.onreadystatechange = function(){
+            //console.log(xhr.readyState);
+            if(xhr.readyState==4){
+                if(xhr.status>=200 && xhr.status<300 || xhr.status==304){
+                    //成功接收
+                    //console.log(xhr.responseText)
+                    box.innerHTML = xhr.responseText;
+                }else{
+                    alert('抱歉，文件没有找到！')
+                }
             }
         }
     }
+
 </script>
 </html>
