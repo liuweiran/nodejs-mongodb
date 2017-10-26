@@ -1,0 +1,14 @@
+const app = require('../app');
+const debug = require('debug');
+const http = require('http');
+
+const default_port = 9902;
+const index = process.argv.indexOf('--port');
+const port = index > -1 ? (process.argv[index+1] || default_port) : default_port;
+
+// app.set('port', port);
+
+app.listen(port, () => {
+    console.log('Server start at http://localhost:%s', port);
+});
+
