@@ -1,18 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>index</title>
+    <title>Test API</title>
 </head>
 <body>
-<div id="box"></div>
+<input id="name" type="text" placeholder="name"/>
+<button id=“btn”>提交</button>
 </body>
 <script>
     window.onload = function() {
-        var box = document.getElementById('box');
+        var btn = document.getElementsByClassName('btn');
+        var name = document.getElementById('name');
+
+
         var xhr = new XMLHttpRequest();
         xhr.open('get', 'http://localhost:3000/123', true);
         xhr.send();
@@ -24,7 +25,7 @@
                     //console.log(xhr.responseText)
                     box.innerHTML = xhr.responseText;
                 }else{
-                    alert('抱歉，文件没有找到！')
+                    alert('err')
                 }
             }
         }

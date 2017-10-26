@@ -17,12 +17,22 @@ function init() {
 }
 
 function list() {
-    return globalDb.collection('users').find({}).toArray()
+    return globalDb.collection('users').find({}).toArray();
 }
 
+function user(id) {
+    return globalDb.collection('users').findOne({id});
+}
+
+function add(data) {
+    return globalDb.collection('users').insertOne(Object.assign(data, {createDate: new Date()}));
+}
 
 module.exports = {
     init,
-    list
+    list,
+    user,
+    add
+
 };
 

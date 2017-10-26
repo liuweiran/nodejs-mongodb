@@ -17,8 +17,11 @@ const app = express();
 app.set('view engine', 'jade'); // 设置模板引擎
 app.set('views', path.join(__dirname, 'views'));  // 设置模板相对路径(相对当前目录)
 
+// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+
 const index = require('./routes/index');
 const list = require('./routes/list');
+const user = require('./routes/user');
 
 app.use(log.getLogger(log4js.getLogger('http')));
 app.use(bodyParser.json());
@@ -29,9 +32,27 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/list', list);
+app.use('/user', user);
+
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+    let err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+// error handler
+app.use(function (err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
+});
 
 module.exports = app;
-
 
 /*
 app.all('*', function(req, res, next) {
@@ -42,7 +63,6 @@ app.all('*', function(req, res, next) {
     res.header("Content-Type", "application/json;charset=utf-8");
     next();
 });
-
 var questions=[
     {
         data:213,
@@ -54,12 +74,10 @@ var questions=[
         num:678,
         age:13
     }];
-
 app.get('/123', function(req, res) {
    res.status(200);
    res.json(questions);
 });
-
 const server = app.listen(3000, function(){
     const host = server.address().address;
     const port = server.address().port;
