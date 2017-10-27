@@ -2,8 +2,8 @@ const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const cors = require("cors");
+const bodyParser = require('body-parser');  // 解析客户端请求的body中的内容
+const cors = require("cors");   // 跨域资源共享
 const log4js = require('log4js');
 
 const mongo = require('./mongo/mongo');
@@ -22,7 +22,7 @@ app.set('views', path.join(__dirname, 'views'));  // 设置模板相对路径(�
 const index = require('./routes/index');
 const user = require('./routes/user');
 
-app.use(log.getLogger(log4js.getLogger('http')));
+app.use(log.getLogger(log4js.getLogger('access')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());

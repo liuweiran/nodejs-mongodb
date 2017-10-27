@@ -1,121 +1,99 @@
-function init() {
-    // 为log创建文件夹
-    try {
-        require('fs').mkdirSync('./log');
-    } catch ( e ) {
-        if ( e.code !== 'EEXIST' ) {
-            console.error("创建文件夹错误，错误是: ", e);
-            process.exit(1);
-        }
-    }
+const log4js = require('log4js');
+const fs = require('fs');
+const logDir = './log';
 
-    const log4js = require('log4js');
-    const jsonLayout = require('log4js-json-layout');
-    log4js.layouts.addLayout('json', jsonLayout);
+function init() {
+
+    !fs.existsSync(logDir) && fs.mkdirSync(logDir);
 
     log4js.configure({
-        "appenders" : [
-            {
-                "type"      : "clustered",
-                "appenders" : [
-                    {
-                        "type"     : "dateFile",
-                        "filename" : "log/access.log",
-                        "pattern"  : "-yyyy-MM-dd",
-                        "category" : "http",
-                        layout     : {
-                            type    : 'json',
-                            source  : 'development',
-                            include : [ 'startTime', 'categoryName', "data", "level", "httpMethod", "ip", "status",
-                                "storeId", "tableId", "userId", "nickname", "isMany", "orderFrom" ]
-                        }
-                    },
-                    {
-                        "type"       : "dateFile",
-                        "filename"   : "log/app.log",
-                        "pattern"    : "-yyyy-MM-dd",
-                        "maxLogSize" : 104857600,
-                        "numBackups" : 3,
-                        layout       : {
-                            type    : 'json',
-                            source  : 'development',
-                            include : [ 'startTime', 'categoryName', "data", "level", "httpMethod", "ip", "status",
-                                "storeId", "tableId", "userId", "nickname", "isMany", "orderFrom" ]
-                        }
-                    },
-                    {
-                        "type"     : "logLevelFilter",
-                        "level"    : "ERROR",
-                        "appender" : {
-                            "type"     : "file",
-                            "filename" : "log/errors.log"
-                        },
-                        layout     : {
-                            type    : 'json',
-                            source  : 'development',
-                            include : [ 'startTime', 'categoryName', "data", "level", "httpMethod", "ip", "status",
-                                "storeId", "tableId", "userId", "nickname", "isMany", "orderFrom" ]
-                        }
-                    },
-                    {
-                        type         : 'console',
-                        messageParam : 'msg',
-                        layout       : {
-                            type    : 'json',
-                            source  : 'development',
-                            include : [ 'startTime', 'categoryName', "data", "level", "httpMethod", "ip", "status",
-                                "storeId", "tableId", "userId", "nickname", "isMany", "orderFrom" ]
-                        }
+        appenders: [{
+            type: "Clustered",
+            appenders: [
+                {
+                    type: 'dateFile',
+                    filename: 'log/access',
+                    pattern: '-yyyy-MM-dd.log',
+                    alwaysIncludePattern: true,
+                    category: 'access',
+                    layout: {
+                        include: [ 'startTime', 'categoryName', "data", "level", "httpMethod", "ip", "status" ]
                     }
-                ]
-            }
-        ]
+                },
+                {
+                    type: 'dateFile',
+                    filename: 'log/app',
+                    pattern: '-yyyy-MM-dd.log',
+                    alwaysIncludePattern: true,
+                    maxLogSize : 104857600,
+                    numBackups : 3,
+                    layout: {
+                        include: [ 'startTime', 'categoryName', "data", "level", "httpMethod", "ip", "status" ]
+                    }
+                },
+                {
+                    type: 'logLevelFilter',
+                    level: 'ERROR',
+                    appender: {
+                        type: 'file',
+                        filename: 'log/errors',
+                        pattern: '-yyyy-MM-dd.log',
+                        alwaysIncludePattern: true,
+                    },
+                    layout: {
+                        include: [ 'startTime', 'categoryName', "data", "level", "httpMethod", "ip", "status" ]
+                    }
+                },
+                {
+                    type: 'console',
+                    messageParam : 'msg',
+                    layout: {
+                        include: [ 'startTime', 'categoryName', "data", "level", "httpMethod", "ip", "status" ]
+                    }
+                }
+            ]
+        }]
     });
 }
 
-function getLoggerHttpAppendObject(httpMethod, ip, status) {
-    return {
-        httpMethod,
-        ip,
-        status
-    };
-}
-
-function getLogger(logger4js) {
-
+function getLogger(logger) {
     return function (req, res, next) {
-        // mount safety
-        if ( req._logging ) return next();
+        if (req._logging) return next();
 
         let start = new Date().getTime();
-
-        // flag as logging
         req._logging = true;
 
-        //hook on end request to emit the log entry of the HTTP request.
-        res.on('finish', function () {
+        res.on('finish', () => {
+
             res.responseTime = new Date().getTime() - start;
-            //status code response level handling
-            if ( res.statusCode ) {
-                let logString = `${req.hostname} ${req.originalUrl || req.url} ${res.responseTime}ms`;
-                let appendObject = getLoggerHttpAppendObject(req.method, req.ip, res.__statusCode || res.statusCode);
-                if ( res.statusCode >= 300 ) {
-                    logger4js.warn(logString, appendObject);
-                } else if ( res.statusCode >= 400 ) {
-                    logger4js.error(logString, appendObject);
-                } else {
-                    logger4js.info(logString, appendObject);
+            if (res.statusCode) {
+                const logString = `${req.hostname} ${req.originalUrl || req.url} ${res.responseTime}ms`;
+                const appendObject = {
+                    httpMethod: req.method,
+                    ip: req.ip,
+                    status: req.statusCode
+                };
+
+                const code = Number(res.statusCode);
+                switch (true) {
+                    case code >= 300 && code !== 304:
+                        logger.warn(logString, appendObject);
+                        break;
+                    case code >= 400:
+                        logger.error(logString, appendObject);
+                        break;
+                    default:
+                        logger.info(logString, appendObject);
+                        break;
                 }
             }
         });
 
-        //ensure next gets always called
         next();
-    };
+    }
 }
 
 module.exports = {
     init,
-    getLoggerHttpAppendObject,
     getLogger
 };

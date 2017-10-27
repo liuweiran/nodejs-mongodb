@@ -18,7 +18,6 @@
     "express": "~4.15.2",
     "jade": "~1.11.0",
     "log4js": "^1.1.1",
-    "log4js-json-layout": "^1.0.5",
     "mongodb": "^2.2.27",
     "morgan": "~1.8.1",
     "qiniu": "^6.1.13",
