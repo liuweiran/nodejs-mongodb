@@ -20,7 +20,6 @@ app.set('views', path.join(__dirname, 'views'));  // 设置模板相对路径(�
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 const index = require('./routes/index');
-const list = require('./routes/list');
 const user = require('./routes/user');
 
 app.use(log.getLogger(log4js.getLogger('http')));
@@ -31,7 +30,6 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/list', list);
 app.use('/user', user);
 
 // catch 404 and forward to error handler

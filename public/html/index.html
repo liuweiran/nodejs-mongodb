@@ -6,29 +6,31 @@
 </head>
 <body>
 <input id="name" type="text" placeholder="name"/>
-<button id=“btn”>提交</button>
+<button id="btn">提交</button>
 </body>
 <script>
     window.onload = function() {
-        var btn = document.getElementsByClassName('btn');
-        var name = document.getElementById('name');
+        var btn = document.getElementById('btn');
 
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('get', 'http://localhost:3000/123', true);
-        xhr.send();
-        xhr.onreadystatechange = function(){
-            //console.log(xhr.readyState);
-            if(xhr.readyState==4){
-                if(xhr.status>=200 && xhr.status<300 || xhr.status==304){
-                    //成功接收
-                    //console.log(xhr.responseText)
-                    box.innerHTML = xhr.responseText;
-                }else{
-                    alert('err')
+        btn.onclick = function(){
+            var name = document.getElementById('name').value;
+            var xhr = new XMLHttpRequest();
+            xhr.open('post', 'http://localhost:9902/user', true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.send("name="+name);
+            xhr.onreadystatechange = function(){
+                //console.log(xhr.readyState);
+                if(xhr.readyState==4){
+                    if(xhr.status>=200 && xhr.status<300 || xhr.status==304){
+                        //成功接收
+                        console.log(xhr.responseText)
+                    }else{
+                        console.warn('err');
+                    }
                 }
             }
         }
+
     }
 </script>
 </html>
