@@ -25,8 +25,6 @@ function init() {
                     filename: 'log/app',
                     pattern: '-yyyy-MM-dd.log',
                     alwaysIncludePattern: true,
-                    maxLogSize : 104857600,
-                    numBackups : 3,
                     layout: {
                         include: [ 'startTime', 'categoryName', "data", "level", "httpMethod", "ip", "status" ]
                     }
@@ -35,7 +33,7 @@ function init() {
                     type: 'logLevelFilter',
                     level: 'ERROR',
                     appender: {
-                        type: 'file',
+                        type: 'dateFile',
                         filename: 'log/errors',
                         pattern: '-yyyy-MM-dd.log',
                         alwaysIncludePattern: true,
@@ -71,16 +69,16 @@ function getLogger(logger) {
                 const appendObject = {
                     httpMethod: req.method,
                     ip: req.ip,
-                    status: req.statusCode
+                    status: res.statusCode
                 };
 
                 const code = Number(res.statusCode);
                 switch (true) {
-                    case code >= 300 && code !== 304:
-                        logger.warn(logString, appendObject);
-                        break;
                     case code >= 400:
                         logger.error(logString, appendObject);
+                        break;
+                    case code >= 300 && code !== 304:
+                        logger.warn(logString, appendObject);
                         break;
                     default:
                         logger.info(logString, appendObject);
