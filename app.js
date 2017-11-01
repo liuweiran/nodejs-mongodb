@@ -41,8 +41,9 @@ app.use(function (req, res, next) {
 
 // 错误处理器中间件的定义和其他中间件一样，唯一的区别是 4 个而不是 3 个参数，即 (err, req, res, next)：
 app.use(function (err, req, res, next) {
-    // set locals, only providing error in development
+    // locals是Express应用中 Application(app)对象和Response(res)对象中的属性，该属性是一个对象。该对象的主要作用是，将值传递到所渲染的模板中。
     res.locals.message = err.message;
+    // 当前用户环境变量中NODE_ENV值
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
     // render the error page
